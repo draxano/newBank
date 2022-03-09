@@ -3,22 +3,24 @@ package newbank.server;
 import java.util.ArrayList;
 
 public class Customer {
-	
-	private ArrayList<Account> accounts;
-	
-	public Customer() {
-		accounts = new ArrayList<>();
-	}
-	
-	public String accountsToString() {
-		String s = "";
-		for(Account a : accounts) {
-			s += a.toString();
-		}
-		return s;
-	}
+    // When a customer is made, each gets given an empty list of accounts
+    private ArrayList<Account> accounts;
 
-	public void addAccount(Account account) {
-		accounts.add(account);		
-	}
+    public Customer() {
+        accounts = new ArrayList<>();
+    }
+
+    // to print out a customer's list of accounts
+    public String accountsToString() {
+        String s = "";
+        for (Account a : accounts) {
+            s += a.toString();
+        }
+        return s;
+    }
+
+    // to add a new account to a customer's list
+    public void addAccount(Account account) {
+        accounts.add(account);
+    }
 }
