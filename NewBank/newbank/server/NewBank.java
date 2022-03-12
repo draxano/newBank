@@ -47,6 +47,7 @@ public class NewBank {
             // if the request says SHOWMYACCOUNTS (with the correct key), then accounts will be shown
             switch (request) {
                 case "SHOWMYACCOUNTS":
+                case "1":
                     return showMyAccounts(customer);
                 default:
                     return "FAIL";
