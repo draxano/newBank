@@ -45,13 +45,23 @@ public class NewBank {
         // current checks if the HashTable has the username (key) inside
         if (customers.containsKey(customer.getKey())) {
             // if the request says SHOWMYACCOUNTS (with the correct key), then accounts will be shown
-            switch (request) {
-                case "SHOWMYACCOUNTS":
-                case "1":
-                    return showMyAccounts(customer);
-                default:
-                    return "FAIL";
+            if (request.equals("SHOWMYACCOUNTS") || request.equals("1")) {
+                return showMyAccounts(customer);
+            } else if (request.toLowerCase().contains("newaccount") || request.toLowerCase().equals("2")) {
+                return "Create new account - TBD";
+            } else if (request.toLowerCase().contains("move") || request.toLowerCase().equals("3")) {
+                return "Move money - TBD";
+            } else if (request.toLowerCase().contains("pay") || request.toLowerCase().equals("4")) {
+                return "Pay someone - TBD";
+            } else {
+                return "FAIL";
             }
+//            switch (request) {
+//                case "SHOWMYACCOUNTS":
+//                case "1":
+//                default:
+//                    return "FAIL";
+//            }
         }
         // otherwise, nothing is shown
         return "FAIL";
