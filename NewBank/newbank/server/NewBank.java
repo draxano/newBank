@@ -56,12 +56,6 @@ public class NewBank {
             } else {
                 return "FAIL";
             }
-//            switch (request) {
-//                case "SHOWMYACCOUNTS":
-//                case "1":
-//                default:
-//                    return "FAIL";
-//            }
         }
         // otherwise, nothing is shown
         return "FAIL";
