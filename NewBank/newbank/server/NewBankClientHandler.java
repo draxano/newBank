@@ -20,6 +20,7 @@ public class NewBankClientHandler extends Thread{
 	}
 	
 	public void run() {
+
 		// keep getting requests from the client and processing them
 		try {
 			// ask for user name
@@ -31,7 +32,7 @@ public class NewBankClientHandler extends Thread{
 			out.println("Checking Details...");
 			// authenticate user and get customer ID token from bank for use in subsequent requests
 			CustomerID customer = bank.checkLogInDetails(userName, password);
-			// if the user is authenticated then get requests from the user and process them 
+			// if the user is authenticated then get requests from the user and process them
 			if(customer != null) {
 				out.println("Log In Successful. What do you want to do?");
 				out.println("You have the following options:");
@@ -39,15 +40,18 @@ public class NewBankClientHandler extends Thread{
 				out.println("2. NEWACCOUNT <Name>");
 				out.println("3. MOVE <Amount> <From> <To>");
 				out.println("4. PAY <Person/Company> <Amount>");
+				out.println("5. EXIT");
 				while(true) {
 					String request = in.readLine();
 					System.out.println("Request from " + customer.getKey());
-					String responce = bank.processRequest(customer, request);
-					out.println(responce);
+					String response = bank.processRequest(customer, request);
+					out.println(response);
+					if (response.equals("exit")) run();
 				}
 			}
 			else {
 				out.println("Log In Failed");
+				run();
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
