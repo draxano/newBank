@@ -53,7 +53,9 @@ public class NewBank {
                 return "Move money - TBD";
             } else if (request.toLowerCase().contains("pay") || request.toLowerCase().equals("4")) {
                 return "Pay someone - TBD";
-            } else {
+            } else if (request.toLowerCase().contains("exit") || request.toLowerCase().equals("5")) {
+                return "exit";
+            }else {
                 return "FAIL";
             }
         }
