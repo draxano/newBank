@@ -1,6 +1,7 @@
 package newbank.server;
 
 import java.util.HashMap;
+import java.util.ArrayList;
 
 public class NewBank {
     // all bank instances will have a HashTable containing all customers
@@ -42,18 +43,27 @@ public class NewBank {
 
     // commands from the NewBank customer are processed in this method
     public synchronized String processRequest(CustomerID customer, String request) {
+        String[] tokens = request.split(" ");
+        String cmd;
+        
+        if(tokens.length == 0) {
+            return "FAIL";
+        }
+        
+        cmd = tokens[0];
+        
         // current checks if the HashTable has the username (key) inside
         if (customers.containsKey(customer.getKey())) {
             // if the request says SHOWMYACCOUNTS (with the correct key), then accounts will be shown
-            if (request.equals("SHOWMYACCOUNTS") || request.equals("1")) {
+            if (cmd.toLowerCase().contains("showmyaccounts") || cmd.equals("1")) {
                 return showMyAccounts(customer);
-            } else if (request.toLowerCase().contains("newaccount") || request.toLowerCase().equals("2")) {
+            } else if (cmd.toLowerCase().contains("newaccount") || cmd.toLowerCase().equals("2")) {
                 return "Create new account - TBD";
-            } else if (request.toLowerCase().contains("move") || request.toLowerCase().equals("3")) {
+            } else if (cmd.toLowerCase().contains("move") || cmd.toLowerCase().equals("3")) {
                 return "Move money - TBD";
-            } else if (request.toLowerCase().contains("pay") || request.toLowerCase().equals("4")) {
+            } else if (cmd.toLowerCase().contains("pay") || cmd.toLowerCase().equals("4")) {
                 return "Pay someone - TBD";
-            } else if (request.toLowerCase().contains("exit") || request.toLowerCase().equals("5")) {
+            } else if (cmd.toLowerCase().contains("exit") || cmd.toLowerCase().equals("5")) {
                 return "exit";
             }else {
                 return "FAIL";
