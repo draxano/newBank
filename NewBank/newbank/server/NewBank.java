@@ -58,11 +58,23 @@ public class NewBank {
             if (cmd.toLowerCase().contains("showmyaccounts") || cmd.equals("1")) {
                 return showMyAccounts(customer);
             } else if (cmd.toLowerCase().contains("newaccount") || cmd.toLowerCase().equals("2")) {
-                return "Create new account - TBD";
+                if(tokens.length < 2) {
+                    return "FAIL";
+                }
+                
+                return newAccount(customer, tokens[1]);
             } else if (cmd.toLowerCase().contains("move") || cmd.toLowerCase().equals("3")) {
-                return "Move money - TBD";
+                if(tokens.length < 4) {
+                    return "FAIL";
+                }
+                
+                return move(customer, tokens[1], tokens[2], tokens[3]);
             } else if (cmd.toLowerCase().contains("pay") || cmd.toLowerCase().equals("4")) {
-                return "Pay someone - TBD";
+                if(tokens.length < 3) {
+                    return "FAIL";
+                }
+                
+                return pay(customer, tokens[1], tokens[2]);
             } else if (cmd.toLowerCase().contains("exit") || cmd.toLowerCase().equals("5")) {
                 return "exit";
             }else {
@@ -77,6 +89,18 @@ public class NewBank {
     // e.g. customers.get("bob") will return bob object. then bob.accountsToString() gets his details
     private String showMyAccounts(CustomerID customer) {
         return (customers.get(customer.getKey())).accountsToString();
+    }
+    
+    private String newAccount(CustomerID customer, String name) {
+        return "Create new account - TBD";
+    }
+    
+    private String move(CustomerID customer, String amount, String from, String to) {
+        return "Move money - TBD";
+    }
+    
+    private String pay(CustomerID customer, String person, String amount) {
+        return "Pay someone - TBD";
     }
 
 }
