@@ -2,9 +2,7 @@
 /shelf/
 /workspace.xml
 /out/
-
-/idea/
-.idea/
-.idea
 .out/
 .out
+
+*/.idea/workspace.xml */.idea/tasks.xml
