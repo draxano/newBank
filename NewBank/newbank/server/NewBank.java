@@ -92,7 +92,17 @@ public class NewBank {
     }
     
     private String newAccount(CustomerID customer, String name) {
-        return "Create new account - TBD";
+        if(!customers.containsKey(customer.getKey())) {
+            return "FAIL";
+        }
+        else if(name.length() < 1) {
+            return "FAIL";
+        }
+
+        Account account = new Account(name, 0.0);
+        customers.get(customer.getKey()).addAccount(account);
+
+        return account.toString();
     }
     
     private String move(CustomerID customer, String amount, String from, String to) {
