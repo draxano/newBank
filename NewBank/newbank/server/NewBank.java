@@ -90,9 +90,26 @@ public class NewBank {
     private String showMyAccounts(CustomerID customer) {
         return (customers.get(customer.getKey())).accountsToString();
     }
-    
-    private String newAccount(CustomerID customer, String name) {
-        return "Create new account - TBD";
+
+    // Create a new account given an existing cutomer Id
+    private String newAccount(CustomerID customerid, String name) {
+        if(!customers.containsKey(customerid.getKey())) {
+            return "FAIL";
+        }
+        else if(name.length() < 1) {
+            return "FAIL";
+        }
+
+        Customer customer = customers.get(customerid.getKey());
+        
+        if(customer.hasAccount(name)) {
+            return "FAIL - Account already exists";
+        }
+
+        Account account = new Account(name, 0.0);
+        customer.addAccount(account);
+
+        return account.toString();
     }
     
     private String move(CustomerID customer, String amount, String from, String to) {

@@ -23,4 +23,15 @@ public class Customer {
     public void addAccount(Account account) {
         accounts.add(account);
     }
+
+    // Whether the customer has an account of the given name
+    public boolean hasAccount(String name) {
+        for(Account a : accounts) {
+            if(a.getName().equals(name)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
