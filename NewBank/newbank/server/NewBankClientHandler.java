@@ -23,7 +23,23 @@ public class NewBankClientHandler extends Thread{
 
 		// keep getting requests from the client and processing them
 		try {
-			// ask for user name
+			out.println("Welcome to the bank. Press 1 to create an account, Press 2 to Login.");
+			String answer = in.readLine();
+			if (answer.equals("1")) {
+				out.println("Set your username");
+				String userN = in.readLine();
+				out.println("Set your password");
+				String pass = in.readLine();
+				if (bank.createNewUser(userN, pass)) {
+					out.println("Account created.");
+				} else {
+					out.println("Account has not been created. User may already in database.");
+				}
+				run();
+			}
+
+			if (answer.equals("2")) {
+			// ask for username
 			out.println("Enter Username");
 			String userName = in.readLine();
 			// ask for password
@@ -31,9 +47,9 @@ public class NewBankClientHandler extends Thread{
 			String password = in.readLine();
 			out.println("Checking Details...");
 			// authenticate user and get customer ID token from bank for use in subsequent requests
-			CustomerID customer = bank.checkLogInDetails(userName, password);
+			boolean verified = bank.checkLogInDetails(userName, password);
 			// if the user is authenticated then get requests from the user and process them
-			if(customer != null) {
+			if (verified) {
 				out.println("Log In Successful. What do you want to do?");
 				out.println("You have the following options:");
 				out.println("1. SHOWMYACCOUNTS");
@@ -41,16 +57,20 @@ public class NewBankClientHandler extends Thread{
 				out.println("3. MOVE <Amount> <From> <To>");
 				out.println("4. PAY <Person/Company> <Amount>");
 				out.println("5. EXIT");
-				while(true) {
+				while (true) {
 					String request = in.readLine();
-					System.out.println("Request from " + customer.getKey());
+					System.out.println("Request from " + userName);
+
+					CustomerID customer = new CustomerID(userName);
 					String response = bank.processRequest(customer, request);
 					out.println(response);
 					if (response.equals("exit")) run();
 				}
-			}
-			else {
+			} else {
 				out.println("Log In Failed");
+				run();
+			}
+		} else {
 				run();
 			}
 		} catch (IOException e) {
