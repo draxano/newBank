@@ -1,5 +1,6 @@
 package newbank.server;
 
+import newbank.database.dbOperations;
 import java.util.HashMap;
 import java.util.ArrayList;
 
@@ -9,8 +10,8 @@ public class NewBank {
     private HashMap<String, Customer> customers;
 
     private NewBank() {
-        customers = new HashMap<>();
-        addTestData();
+        customers = dbOperations.loadMap();
+        // addTestData();
     }
 
     // just a test function to add some fake customers. you can add an account to their list,
@@ -33,51 +34,57 @@ public class NewBank {
         return bank;
     }
 
-    // creates customer ID when login details are checked. The username is the key
-    public synchronized CustomerID checkLogInDetails(String userName, String password) {
-        if (customers.containsKey(userName)) {
-            return new CustomerID(userName);
+    // now this method checks the database for the username and the password
+    public synchronized boolean checkLogInDetails(String userName, String password) {
+        return dbOperations.checkLogin(userName, password);
+    }
+
+    // creates new user and puts into database
+    public boolean createNewUser(String userName, String password) {
+        if (dbOperations.insert(userName, password)) {
+            customers.put(userName, new Customer());
+            return true;
         }
-        return null;
+        return false;
     }
 
     // commands from the NewBank customer are processed in this method
     public synchronized String processRequest(CustomerID customer, String request) {
         String[] tokens = request.split(" ");
         String cmd;
-        
-        if(tokens.length == 0) {
+
+        if (tokens.length == 0) {
             return "FAIL";
         }
-        
+
         cmd = tokens[0];
-        
+
         // current checks if the HashTable has the username (key) inside
         if (customers.containsKey(customer.getKey())) {
             // if the request says SHOWMYACCOUNTS (with the correct key), then accounts will be shown
             if (cmd.toLowerCase().contains("showmyaccounts") || cmd.equals("1")) {
                 return showMyAccounts(customer);
             } else if (cmd.toLowerCase().contains("newaccount") || cmd.toLowerCase().equals("2")) {
-                if(tokens.length < 2) {
+                if (tokens.length < 2) {
                     return "FAIL";
                 }
-                
+
                 return newAccount(customer, tokens[1]);
             } else if (cmd.toLowerCase().contains("move") || cmd.toLowerCase().equals("3")) {
-                if(tokens.length < 4) {
+                if (tokens.length < 4) {
                     return "FAIL";
                 }
-                
+
                 return move(customer, tokens[1], tokens[2], tokens[3]);
             } else if (cmd.toLowerCase().contains("pay") || cmd.toLowerCase().equals("4")) {
-                if(tokens.length < 3) {
+                if (tokens.length < 3) {
                     return "FAIL";
                 }
-                
+
                 return pay(customer, tokens[1], tokens[2]);
             } else if (cmd.toLowerCase().contains("exit") || cmd.toLowerCase().equals("5")) {
                 return "exit";
-            }else {
+            } else {
                 return "FAIL";
             }
         }
@@ -93,16 +100,15 @@ public class NewBank {
 
     // Create a new account given an existing cutomer Id
     private String newAccount(CustomerID customerid, String name) {
-        if(!customers.containsKey(customerid.getKey())) {
+        if (!customers.containsKey(customerid.getKey())) {
             return "FAIL";
-        }
-        else if(name.length() < 1) {
+        } else if (name.length() < 1) {
             return "FAIL";
         }
 
         Customer customer = customers.get(customerid.getKey());
-        
-        if(customer.hasAccount(name)) {
+
+        if (customer.hasAccount(name)) {
             return "FAIL - Account already exists";
         }
 
@@ -111,11 +117,11 @@ public class NewBank {
 
         return account.toString();
     }
-    
+
     private String move(CustomerID customer, String amount, String from, String to) {
         return "Move money - TBD";
     }
-    
+
     private String pay(CustomerID customer, String person, String amount) {
         return "Pay someone - TBD";
     }
