@@ -48,6 +48,20 @@ public class NewBank {
         return false;
     }
 
+    // gets account from database and adds to customer object inside the hashmap
+    public boolean retrieveAccounts(CustomerID customer) {
+        String customerId = customer.getKey();
+        ArrayList<Account> accounts = dbOperations.getAccounts(customerId);
+        if (!accounts.isEmpty()) {
+            for (Account account : accounts) {
+                customers.get(customerId.toLowerCase()).addAccount(account);
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     // commands from the NewBank customer are processed in this method
     public synchronized String processRequest(CustomerID customer, String request) {
         String[] tokens = request.split(" ");
