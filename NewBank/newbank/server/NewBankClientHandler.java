@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.Locale;
 
 public class NewBankClientHandler extends Thread{
 	
@@ -41,7 +42,7 @@ public class NewBankClientHandler extends Thread{
 			if (answer.equals("2")) {
 			// ask for username
 			out.println("Enter Username");
-			String userName = in.readLine();
+			String userName = in.readLine().toLowerCase();
 			// ask for password
 			out.println("Enter Password");
 			String password = in.readLine();
@@ -52,8 +53,8 @@ public class NewBankClientHandler extends Thread{
 			if (verified) {
 				out.println("Log In Successful. What do you want to do?");
 				out.println("You have the following options:");
-				out.println("1. SHOWMYACCOUNTS");
-				out.println("2. NEWACCOUNT <Name>");
+				out.println("Enter SHOWMYACCOUNTS or enter '1' to view your accounts");
+				out.println("Enter NEWACCOUNT or enter '2' to create a new account");
 				out.println("3. MOVE <Amount> <From> <To>");
 				out.println("4. PAY <Person/Company> <Amount>");
 				out.println("5. EXIT");
@@ -64,6 +65,16 @@ public class NewBankClientHandler extends Thread{
 					CustomerID customer = new CustomerID(userName);
 					String response = bank.processRequest(customer, request);
 					out.println(response);
+
+					if (response.equals("Open a new bank account:")) {
+						out.println("What type of account is it?");
+						String accountType = in.readLine();
+						out.println("What would you like your starting balance to be?");
+						double startingBalance = Double.parseDouble(in.readLine());
+						String accountResponse = bank.processAccountRequest(userName, accountType, startingBalance);
+						out.println(accountResponse);
+					}
+
 					if (response.equals("exit")) run();
 				}
 			} else {
