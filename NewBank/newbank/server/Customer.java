@@ -12,11 +12,12 @@ public class Customer {
 
     // to print out a customer's list of accounts
     public String accountsToString() {
-        String s = "";
+        StringBuilder s = new StringBuilder();
         for (Account a : accounts) {
-            s += a.toString();
+            s.append(a.toString());
+            s.append(" , ");
         }
-        return s;
+        return s.toString();
     }
 
     // to add a new account to a customer's list
