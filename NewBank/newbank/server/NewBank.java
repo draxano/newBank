@@ -1,6 +1,9 @@
 package newbank.server;
 
+import newbank.database.dbCreateOperations;
 import newbank.database.dbOperations;
+import newbank.database.dbReadOperations;
+
 import java.util.HashMap;
 import java.util.ArrayList;
 
@@ -36,12 +39,12 @@ public class NewBank {
 
     // now this method checks the database for the username and the password
     public synchronized boolean checkLogInDetails(String userName, String password) {
-        return dbOperations.checkLogin(userName, password);
+        return dbReadOperations.checkLogin(userName, password);
     }
 
     // creates new user and puts into database
     public boolean createNewUser(String userName, String password) {
-        if (dbOperations.insert(userName, password)) {
+        if (dbCreateOperations.insert(userName, password)) {
             customers.put(userName, new Customer());
             return true;
         }
@@ -51,7 +54,7 @@ public class NewBank {
     // gets account from database and adds to customer object inside the hashmap
     public boolean retrieveAccounts(CustomerID customer) {
         String customerId = customer.getKey();
-        ArrayList<Account> accounts = dbOperations.getAccounts(customerId);
+        ArrayList<Account> accounts = dbReadOperations.getAccounts(customerId);
         if (!accounts.isEmpty()) {
             for (Account account : accounts) {
                 customers.get(customerId.toLowerCase()).addAccount(account);
@@ -77,13 +80,14 @@ public class NewBank {
         if (customers.containsKey(customer.getKey())) {
             // if the request says SHOWMYACCOUNTS (with the correct key), then accounts will be shown
             if (cmd.toLowerCase().contains("showmyaccounts") || cmd.equals("1")) {
-                return showMyAccounts(customer);
-            } else if (cmd.toLowerCase().contains("newaccount") || cmd.toLowerCase().equals("2")) {
-                if (tokens.length < 2) {
-                    return "FAIL";
+                if (retrieveAccounts(customer)) {
+                    return showMyAccounts(customer);
+                } else {
+                    return "No accounts have been opened for this user. Select option 2 to open an account.";
                 }
+            } else if (cmd.toLowerCase().contains("newaccount") || cmd.toLowerCase().equals("2")) {
+                return "Open a new bank account:";
 
-                return newAccount(customer, tokens[1]);
             } else if (cmd.toLowerCase().contains("move") || cmd.toLowerCase().equals("3")) {
                 if (tokens.length < 4) {
                     return "FAIL";
@@ -119,16 +123,12 @@ public class NewBank {
         } else if (name.length() < 1) {
             return "FAIL";
         }
-
         Customer customer = customers.get(customerid.getKey());
-
         if (customer.hasAccount(name)) {
             return "FAIL - Account already exists";
         }
-
         Account account = new Account(name, 0.0);
         customer.addAccount(account);
-
         return account.toString();
     }
 
@@ -140,4 +140,13 @@ public class NewBank {
         return "Pay someone - TBD";
     }
 
+    // takes user's input of account type and starting balance and opens a new account
+    // using the database
+    public String processAccountRequest(String userName, String accountType, double startingBalance) {
+        if (dbCreateOperations.addAccount(userName, accountType, startingBalance)) {
+            return "Account for " + userName + " has been created.";
+        } else {
+            return "Account request denied.";
+        }
+    }
 }
