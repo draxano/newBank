@@ -21,4 +21,8 @@ public class Account {
         return accountName;
     }
 
+    public double getBalance() {
+        return openingBalance;
+    }
+
 }
