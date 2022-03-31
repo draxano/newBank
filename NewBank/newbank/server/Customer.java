@@ -12,16 +12,22 @@ public class Customer {
 
     // to print out a customer's list of accounts
     public String accountsToString() {
-        String s = "";
+        StringBuilder s = new StringBuilder();
         for (Account a : accounts) {
-            s += a.toString();
+            s.append(a.toString());
+            s.append(" , ");
         }
-        return s;
+        return s.toString();
     }
 
     // to add a new account to a customer's list
     public void addAccount(Account account) {
         accounts.add(account);
+    }
+
+    // if customer has any accounts loaded in the program
+    public boolean isEmpty() {
+        return accounts.isEmpty();
     }
 
     // Whether the customer has an account of the given name
