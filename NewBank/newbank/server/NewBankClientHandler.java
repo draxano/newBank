@@ -12,6 +12,7 @@ public class NewBankClientHandler extends Thread{
 	private NewBank bank;
 	private BufferedReader in;
 	private PrintWriter out;
+
 	
 	
 	public NewBankClientHandler(Socket s) throws IOException {
@@ -55,24 +56,41 @@ public class NewBankClientHandler extends Thread{
 				out.println("You have the following options:");
 				out.println("Enter SHOWMYACCOUNTS or enter '1' to view your accounts");
 				out.println("Enter NEWACCOUNT or enter '2' to create a new account");
-				out.println("3. MOVE <Amount> <From> <To>");
-				out.println("4. PAY <Person/Company> <Amount>");
+				out.println("Enter WITHDRAW or enter '3' to withdraw money from an account");
+				out.println("Enter DEPOSIT or enter '4' to deposit money into an account");
 				out.println("5. EXIT");
 				while (true) {
 					String request = in.readLine();
 					System.out.println("Request from " + userName);
 
-					CustomerID customer = new CustomerID(userName);
-					String response = bank.processRequest(customer, request);
+					String response = bank.processRequest(userName, request);
 					out.println(response);
 
 					if (response.equals("Open a new bank account:")) {
-						out.println("What type of account is it?");
-						String accountType = in.readLine();
+						out.println("What type of account is it? / Account name");
+						String accountType = in.readLine().toLowerCase();
 						out.println("What would you like your starting balance to be?");
 						double startingBalance = Double.parseDouble(in.readLine());
 						String accountResponse = bank.processAccountRequest(userName, accountType, startingBalance);
 						out.println(accountResponse);
+					}
+
+					if (response.equals("Deposit Money:")) {
+						out.println("Which account would you like to deposit into?");
+						String accountName = in.readLine().toLowerCase();
+						out.println("How much would you like to deposit?");
+						double deposit = Double.parseDouble(in.readLine());
+						String depositResponse = bank.depositMoney(userName, accountName, deposit);
+						out.println(depositResponse);
+					}
+
+					if (response.equals("Withdraw Money:")) {
+						out.println("Which account would you like to withdraw from?");
+						String accountName = in.readLine().toLowerCase();
+						out.println("How much would you like to withdraw?");
+						double withdraw = Double.parseDouble(in.readLine());
+						String withdrawResponse = bank.withdrawMoney(userName, accountName, withdraw);
+						out.println(withdrawResponse);
 					}
 
 					if (response.equals("exit")) run();
