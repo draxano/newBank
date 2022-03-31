@@ -25,6 +25,11 @@ public class Customer {
         accounts.add(account);
     }
 
+    // if customer has any accounts loaded in the program
+    public boolean isEmpty() {
+        return accounts.isEmpty();
+    }
+
     // Whether the customer has an account of the given name
     public boolean hasAccount(String name) {
         for(Account a : accounts) {
