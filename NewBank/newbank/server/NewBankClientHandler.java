@@ -53,16 +53,14 @@ public class NewBankClientHandler extends Thread{
 			// if the user is authenticated then get requests from the user and process them
 			if (verified) {
 				out.println("Log In Successful. What do you want to do?");
-				out.println("You have the following options:");
-				out.println("Enter SHOWMYACCOUNTS or enter '1' to view your accounts");
-				out.println("Enter NEWACCOUNT or enter '2' to create a new account");
-				out.println("Enter WITHDRAW or enter '3' to withdraw money from an account");
-				out.println("Enter DEPOSIT or enter '4' to deposit money into an account");
-				out.println("5. EXIT");
+				instructions();
 				while (true) {
 					String request = in.readLine();
+					if (request.equalsIgnoreCase("h") || request.equalsIgnoreCase("help")) {
+						instructions();
+						continue;
+					}
 					System.out.println("Request from " + userName);
-
 					String response = bank.processRequest(userName, request);
 					out.println(response);
 
@@ -93,6 +91,8 @@ public class NewBankClientHandler extends Thread{
 						out.println(withdrawResponse);
 					}
 
+
+
 					if (response.equals("exit")) run();
 				}
 			} else {
@@ -114,6 +114,17 @@ public class NewBankClientHandler extends Thread{
 				Thread.currentThread().interrupt();
 			}
 		}
+	}
+
+	private void instructions() {
+		out.println("You have the following options:");
+		out.println("Enter SHOWMYACCOUNTS or enter '1' to view your accounts");
+		out.println("Enter NEWACCOUNT or enter '2' to create a new account");
+		out.println("Enter WITHDRAW or enter '3' to withdraw money from an account");
+		out.println("Enter DEPOSIT or enter '4' to deposit money into an account");
+		out.println("Enter TRANSFER or enter '5' to transfer money from one account to another account");
+		out.println("Enter HELP or enter 'h' to see options again.");
+		out.println("Enter EXIT or 'x' to exit.");
 	}
 
 }
