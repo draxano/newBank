@@ -25,4 +25,8 @@ public class Account {
         return openingBalance;
     }
 
+    public void setBalance(double balance) {
+        this.openingBalance = balance;
+    }
+
 }
