@@ -67,13 +67,15 @@ public class NewBank {
             if (cmd.toLowerCase().contains("showmyaccounts") || cmd.equals("1")) {
                 return retrieveAccounts(customer) ? showMyAccounts(customer) : "No accounts have been opened for this user. " +
                         "Select option 2 to open an account.";
-            } else if (cmd.toLowerCase().contains("newaccount") || cmd.toLowerCase().equals("2")) {
+            } else if (cmd.toLowerCase().contains("newaccount") || cmd.equalsIgnoreCase("2")) {
                 return "Open a new bank account:";
-            } else if (cmd.toLowerCase().contains("withdraw") || cmd.toLowerCase().equals("3")) {
+            } else if (cmd.toLowerCase().contains("withdraw") || cmd.equalsIgnoreCase("3")) {
                 return "Withdraw Money:";
-            } else if (cmd.toLowerCase().contains("deposit") || cmd.toLowerCase().equals("4")) {
+            } else if (cmd.toLowerCase().contains("deposit") || cmd.equalsIgnoreCase("4")) {
                 return "Deposit Money:";
-            } else if (cmd.toLowerCase().contains("exit") || cmd.toLowerCase().equals("5")) {
+            } else if (cmd.toLowerCase().contains("transfer") || cmd.equalsIgnoreCase("5")) {
+                return "Transfer Money:";
+            } else if (cmd.toLowerCase().contains("exit") || cmd.equalsIgnoreCase("x")) {
                 return "exit";
             } else {
                 return "FAIL";
@@ -89,29 +91,6 @@ public class NewBank {
         return (customers.get(customer)).accountsToString();
     }
 
-//    // Create a new account given an existing cutomer Id
-//    private String newAccount(CustomerID customerid, String name) {
-//        if (!customers.containsKey(customerid.getKey())) {
-//            return "FAIL";
-//        } else if (name.length() < 1) {
-//            return "FAIL";
-//        }
-//        Customer customer = customers.get(customerid.getKey());
-//        if (customer.hasAccount(name)) {
-//            return "FAIL - Account already exists";
-//        }
-//        Account account = new Account(name, 0.0);
-//        customer.addAccount(account);
-//        return account.toString();
-//    }
-
-//    private String move(CustomerID customer, String amount, String from, String to) {
-//        return "Move money - TBD";
-//    }
-
-//    private String pay(CustomerID customer, String person, String amount) {
-//        return "Pay someone - TBD";
-//    }
 
     // adds money to an account (if account exists), returns confirmation message.
     public String depositMoney(String userName, String accountName, double deposit) {
@@ -122,6 +101,7 @@ public class NewBank {
         double currentBalance = account.getBalance(); // use account object to obtain balance
         double newBalance = currentBalance + deposit; // calculate new balance
         if (dbUpdateOperations.update(accountId, newBalance)) {
+            customers.get(userName).getAccount(accountName).setBalance(newBalance); // update customer object in hashMap
             return accountName + " has been credited with " + deposit + "." + " The new balance is " + newBalance;
         }
         return "Deposit request has failed.";
@@ -130,12 +110,13 @@ public class NewBank {
     // withdraws money from account (if enough money present && account exists), returns confirmation message.
     public String withdrawMoney(String userName, String accountName, double withdraw) {
         Account account = dbReadOperations.getAccount(userName, accountName); // obtain account object
-        if (account == null) return "Account does not exist. Deposit request failed.";
+        if (account == null) return "Account does not exist. Withdraw request failed.";
         int accountId = dbReadOperations.getAccountId(userName, accountName);
 
         double currentBalance = account.getBalance(); // use account object to obtain balance
         double newBalance = currentBalance - withdraw; // calculate new balance
         if (dbUpdateOperations.update(accountId, newBalance)) {
+            customers.get(userName).getAccount(accountName).setBalance(newBalance); // update customer object in hashMap
             return userName + " has withdrawn " + withdraw + " from " + accountName + "." + " The new balance is " + newBalance;
         }
         return "Withdraw request has failed. Double check your balance.";
@@ -153,8 +134,9 @@ public class NewBank {
                 }
             }
         }
-
+        // if an account was created successfully then add the account to the associated customer object in the hashMap
         if (dbCreateOperations.addAccount(userName, accountType, startingBalance)) {
+            customers.get(userName).addAccount(new Account(accountType, startingBalance));
             return "Account for " + userName + " has been created.";
         } else {
             return "Account request denied.";
