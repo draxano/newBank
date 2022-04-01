@@ -30,14 +30,13 @@ public class Customer {
         return accounts.isEmpty();
     }
 
-    // Whether the customer has an account of the given name
-    public boolean hasAccount(String name) {
+    // get the customer account of the given name
+    public Account getAccount(String name) {
         for(Account a : accounts) {
-            if(a.getName().equals(name)) {
-                return true;
+            if(a.getName().equalsIgnoreCase(name)) {
+                return a;
             }
         }
-
-        return false;
+        return null;
     }
 }
