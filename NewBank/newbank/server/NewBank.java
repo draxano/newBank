@@ -95,7 +95,7 @@ public class NewBank {
     public String depositMoney(String userName, String accountName, double deposit) {
         Account account = dbReadOperations.getAccount(userName, accountName); // obtain an account object
         if (account == null) return "Account does not exist. Deposit request failed.";
-        if (!customers.get(userName).getAccounts().contains(account)) {
+        if (!customers.get(userName).getAccounts().contains(account)) { // adding the account before we manipulate balance
             customers.get(userName).addAccount(account);
         }
 
@@ -115,7 +115,7 @@ public class NewBank {
         Account account = dbReadOperations.getAccount(userName, accountName); // obtain account object
 
         if (account == null) return "Account does not exist. Withdraw request failed.";
-        if (!customers.get(userName).getAccounts().contains(account)) {
+        if (!customers.get(userName).getAccounts().contains(account)) { // adding the account before we manipulate balance
             customers.get(userName).addAccount(account);
         }
 
@@ -137,6 +137,12 @@ public class NewBank {
         Account account2 = dbReadOperations.getAccount(userName, secondAccountName);
         if (account1 == null || account2 == null) {
             return "One or both of the entered accounts does not exist. Transfer request failed.";
+        }
+        if (!customers.get(userName).getAccounts().contains(account1)) { // adding the account before we manipulate balance
+            customers.get(userName).addAccount(account1);
+        }
+        if (!customers.get(userName).getAccounts().contains(account2)) {
+            customers.get(userName).addAccount(account2);
         }
         int account1ID = dbReadOperations.getAccountId(userName, firstAccountName);
         int account2ID = dbReadOperations.getAccountId(userName, secondAccountName);
