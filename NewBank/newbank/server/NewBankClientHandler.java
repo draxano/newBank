@@ -91,7 +91,16 @@ public class NewBankClientHandler extends Thread{
 						out.println(withdrawResponse);
 					}
 
-
+					if (response.equals("Transfer Money:")) {
+						out.println("Which account would you like to transfer money from?");
+						String firstAccountName = in.readLine().toLowerCase();
+						out.println("Which account would you like to transfer money to?");
+						String secondAccountName = in.readLine().toLowerCase();
+						out.println("Please enter the transfer amount: ");
+						double transfer = Double.parseDouble(in.readLine());
+						String transferResponse = bank.transferMoney(userName, firstAccountName, secondAccountName, transfer);
+						out.println(transferResponse);
+					}
 
 					if (response.equals("exit")) run();
 				}
