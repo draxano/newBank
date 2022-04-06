@@ -1,5 +1,7 @@
 package newbank.server;
 
+import java.util.Objects;
+
 public class Account {
 
     // All accounts that can be made has a name and starting balance
@@ -29,4 +31,16 @@ public class Account {
         this.openingBalance = balance;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Account account = (Account) o;
+        return Objects.equals(accountName, account.accountName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(accountName);
+    }
 }

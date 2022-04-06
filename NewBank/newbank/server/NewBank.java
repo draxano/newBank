@@ -36,19 +36,18 @@ public class NewBank {
     }
 
     // gets account from database and adds to customer object inside the hashmap
-    public boolean retrieveAccounts(String customer) {
-        // if the map already contains accounts then no need to duplicate results
-        if (!customers.get(customer).isEmpty()) return true;
+    private boolean retrieveAccounts(String customer) {
         // otherwise, create new accounts list and populate it from database
+        // only if the account doesn't already exist
         ArrayList<Account> accounts = dbReadOperations.getAccounts(customer);
-        if (!accounts.isEmpty()) {
-            for (Account account : accounts) {
-                customers.get(customer).addAccount(account);
-            }
-            return true;
+        if (accounts.isEmpty()) return false;
+        ArrayList<Account> accountsLoaded = customers.get(customer).getAccounts();
+        if (accountsLoaded.isEmpty()) {
+            accounts.forEach(a -> customers.get(customer).addAccount(a));
         } else {
-            return false;
+            accounts.stream().filter(a -> !accountsLoaded.contains(a)).forEach(a -> customers.get(customer).addAccount(a));
         }
+        return true;
     }
 
     // commands from the NewBank customer are processed in this method
@@ -96,6 +95,10 @@ public class NewBank {
     public String depositMoney(String userName, String accountName, double deposit) {
         Account account = dbReadOperations.getAccount(userName, accountName); // obtain an account object
         if (account == null) return "Account does not exist. Deposit request failed.";
+        if (!customers.get(userName).getAccounts().contains(account)) {
+            customers.get(userName).addAccount(account);
+        }
+
         int accountId = dbReadOperations.getAccountId(userName, accountName);
 
         double currentBalance = account.getBalance(); // use account object to obtain balance
@@ -110,7 +113,12 @@ public class NewBank {
     // withdraws money from account (if enough money present && account exists), returns confirmation message.
     public String withdrawMoney(String userName, String accountName, double withdraw) {
         Account account = dbReadOperations.getAccount(userName, accountName); // obtain account object
-        if (account == null) {return "Account does not exist. Withdraw request failed.";}
+
+        if (account == null) return "Account does not exist. Withdraw request failed.";
+        if (!customers.get(userName).getAccounts().contains(account)) {
+            customers.get(userName).addAccount(account);
+        }
+
         int accountId = dbReadOperations.getAccountId(userName, accountName);
 
         double currentBalance = account.getBalance(); // use account object to obtain balance
