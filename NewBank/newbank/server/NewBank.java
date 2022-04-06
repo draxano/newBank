@@ -113,10 +113,12 @@ public class NewBank {
     // withdraws money from account (if enough money present && account exists), returns confirmation message.
     public String withdrawMoney(String userName, String accountName, double withdraw) {
         Account account = dbReadOperations.getAccount(userName, accountName); // obtain account object
+
         if (account == null) return "Account does not exist. Withdraw request failed.";
         if (!customers.get(userName).getAccounts().contains(account)) {
             customers.get(userName).addAccount(account);
         }
+
         int accountId = dbReadOperations.getAccountId(userName, accountName);
 
         double currentBalance = account.getBalance(); // use account object to obtain balance
@@ -126,6 +128,34 @@ public class NewBank {
             return userName + " has withdrawn " + withdraw + " from " + accountName + "." + " The new balance is " + newBalance;
         }
         return "Withdraw request has failed. Double check your balance.";
+    }
+
+    // transfers amount of money from account1 to account2 (if enough money present && account exists),
+    // returns confirmation message.
+    public String transferMoney(String userName, String firstAccountName, String secondAccountName, double transferAmount){
+        Account account1 = dbReadOperations.getAccount(userName, firstAccountName);
+        Account account2 = dbReadOperations.getAccount(userName, secondAccountName);
+        if (account1 == null || account2 == null) {
+            return "One or both of the entered accounts does not exist. Transfer request failed.";
+        }
+        int account1ID = dbReadOperations.getAccountId(userName, firstAccountName);
+        int account2ID = dbReadOperations.getAccountId(userName, secondAccountName);
+
+        double account1Balance = account1.getBalance(); // accessing the balance from account1
+        double account2Balance = account2.getBalance(); // and account2
+        double newAccount1Balance = account1Balance - transferAmount; // moving amount from account1 to account2
+        double newAccount2Balance = account2Balance + transferAmount;
+
+        // only if balance values in the database are updated, they will be set in the HashMap
+        if (dbUpdateOperations.update(account1ID, newAccount1Balance) && dbUpdateOperations.update(account2ID, newAccount2Balance)){
+            customers.get(userName).getAccount(firstAccountName).setBalance(newAccount1Balance);
+            customers.get(userName).getAccount(secondAccountName).setBalance(newAccount2Balance);
+            return userName + " has transferred £" + transferAmount + " from " + firstAccountName.toUpperCase()
+                    + " to " + secondAccountName.toUpperCase() + ".\nHere is your current balance:\n"
+                    + firstAccountName.toUpperCase() + ": £" + newAccount1Balance + "\n" + secondAccountName.toUpperCase()
+                    + ": £" + newAccount2Balance;
+        }
+        return "Transfer request has failed. Double check your balance.";
     }
 
     // takes user's input of account type and starting balance and opens a new account
