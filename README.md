@@ -33,7 +33,7 @@ note: this will commit ALL of your changes
 To push your changes to your new branch:
 `git push origin HEAD`
 
-This will then generate a link to your new branch, where you are able to create a PR.
+This will then generate a link to your new branch, where you are able to create a pull request.
 
 ## Contribution Guide
 Please do not push to the main branch. This could involve overwriting someone else's work! Instead, please follow the steps above to push to a branch that you have created, and open a pull request. 
@@ -54,11 +54,16 @@ Once this is running, proceed to run the client from newbank/client/ExampleClien
 The product allows banking using just the command line. Below, we will show you how you can log in and begin banking using New Bank. 
 
 ### Logging In
-TBD
+After following the steps in Running New Bank, you should be given the option to either create a new user account or to log in with your existing username and password details. You should be able to proceed with the option by entering 1 or 2 respectively. 
 
 ### Functionality
 
-| Command | Description | Example |
-|----------|----------|----------|
-| `SHOWMYACCOUNTS`  | Returns a list of all the customer's accounts, alongside their balances  | `SHOWMYACCOUNTS`  |
-| `PAY`  | Allows an authenticated user to pay another  | `PAY John 500`  |
+| Command          | Description                                                                                                                                                                                            | Example                                           |
+|------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------|
+| `SHOWMYACCOUNTS` | Enter '1' or type SHOWMYACCOUNTS into the command line to use this functionality. Returns a list of all the customer's accounts, alongside their balances.                                             | `SHOWMYACCOUNTS`                                  |
+| `NEWACCOUNT`     | Enter '2' or type NEWACCOUNT into the command line to use this functionality. Allows an authenticated user to create a new account by specifying a new account name, followed by its starting balance. | `NewAccountName, 200`                             |
+| `WITHDRAW`       | Enter '3' or type WITHDRAW into the command line to use this functionality. Allows an authenticated user to withdraw an amount from a specified account.                                               | `AccountToWithdrawFrom, 200`                      |
+| `DEPOSIT`        | Enter '4' or type DEPOSIT into the command line to use this functionality. Allows an authenticated user to deposit an amount to a specified account.                                                   | `AccountToDepositTo, 200`                         |
+| `TRANSFER`       | Enter '5' or type TRANSFER into the command line to use this functionality. Allows an authenticated user to transfer an amount from one account to another account.                                    | `AccountToTransferFrom, AccountToTransferTo, 200` |
+| `HELP`           | Enter 'h' or type HELP into the command line to go back to the navigation menu.                                                                                                                        | `h`                                               |
+| `EXIT`           | Enter 'x' or type EXIT into the command line to log out and exit the program.                                                                                                                          | `x`                                               |
