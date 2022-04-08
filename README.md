@@ -9,6 +9,8 @@ New Bank is an assignment as part of the University of Bath's Software Engineeri
 ## Setup & Requirements
 
 For this project, we are using JVM 11. 
+When running the program, we might faced with problem which states "java 16 not found". In order to avoid it be sure that your machine has the latest version of Java.
+In order to access the code from IntelliJ please clone it using the IntelliJ GUI. You shall see 3 options when trying to open a project, please select "get from VCS" and then paste the url whcih github provides. 
 
 ## Using Git
 
