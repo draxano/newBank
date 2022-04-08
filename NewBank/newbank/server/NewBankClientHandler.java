@@ -102,6 +102,39 @@ public class NewBankClientHandler extends Thread{
 						out.println(transferResponse);
 					}
 
+					if (response.equals("Close an Account:")) {
+						out.println("Which account would you like to close?");
+						String accountName = in.readLine().toLowerCase();
+						out.println("Are you sure you want to close "+ accountName
+								+ "? All of this account's data will be deleted.\nEnter 1 to proceed, any other key to cancel.");
+						String userResponse = in.readLine().toLowerCase();
+						if (userResponse.equalsIgnoreCase("1")){
+							String deleteAccountResponse = bank.deleteAccount(userName, accountName);
+							out.println(deleteAccountResponse);
+						} else {out.println("Account " + accountName + " not deleted.");}
+
+					}
+
+					if (response.equals("Make a payment:")) {
+						out.println("Enter the username of the customer or company you wish to make a payment to:");
+						String userName2 = in.readLine().toLowerCase();
+						out.println("Enter " + userName2 + "'s" + " account name you wish to send the payment to:");
+						String accountName2 = in.readLine().toLowerCase();
+						out.println("Please enter the payment amount: ");
+						double pay = Double.parseDouble(in.readLine());
+						out.println("Which account would you like to make the payment from? Enter your account:");
+						String accountName1 = in.readLine().toLowerCase();
+						String confirm = "Are you sure to proceed with the following payment:\n\nPAY "
+								+ userName2 + " £" + pay + " to account " + accountName2.toUpperCase()
+								+ "\n\nEnter 1 to confirm, or any other key to cancel";
+						out.println(confirm);
+						String userResponse = in.readLine().toLowerCase();
+						if (userResponse.equalsIgnoreCase("1")){
+							String payResponse = bank.pay(userName, accountName1, userName2, accountName2, pay);
+							out.println(payResponse);
+						} else {out.println("Payment transaction cancelled.");}
+					}
+
 					if (response.equals("exit")) run();
 				}
 			} else {
@@ -129,11 +162,13 @@ public class NewBankClientHandler extends Thread{
 		out.println("You have the following options:");
 		out.println("Enter SHOWMYACCOUNTS or enter '1' to view your accounts");
 		out.println("Enter NEWACCOUNT or enter '2' to create a new account");
-		out.println("Enter WITHDRAW or enter '3' to withdraw money from an account");
+		out.println("Enter WITHDRAW or enter '3' to withdraw money from an account.");
 		out.println("Enter DEPOSIT or enter '4' to deposit money into an account");
-		out.println("Enter TRANSFER or enter '5' to transfer money from one account to another account");
-		out.println("Enter HELP or enter 'h' to see options again.");
-		out.println("Enter EXIT or 'x' to exit.");
+		out.println("Enter TRANSFER or enter '5' to transfer money between accounts");
+		out.println("Enter CLOSEACCOUNT or enter '6' to close an account");
+		out.println("Enter PAY or enter '7' to pay to someone's account");
+		out.println("Enter HELP or enter 'h' to see options again");
+		out.println("Enter EXIT or 'x' to exit");
 	}
 
 }

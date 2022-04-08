@@ -4,6 +4,7 @@ import newbank.database.dbCreateOperations;
 import newbank.database.dbOperations;
 import newbank.database.dbReadOperations;
 import newbank.database.dbUpdateOperations;
+import newbank.database.dbDeleteOperations;
 
 import java.util.HashMap;
 import java.util.ArrayList;
@@ -74,6 +75,10 @@ public class NewBank {
                 return "Deposit Money:";
             } else if (cmd.toLowerCase().contains("transfer") || cmd.equalsIgnoreCase("5")) {
                 return "Transfer Money:";
+            } else if (cmd.toLowerCase().contains("closeaccount") || cmd.equalsIgnoreCase("6")) {
+                return "Close an Account:";
+            } else if (cmd.toLowerCase().contains("pay") || cmd.equalsIgnoreCase("7")) {
+                return "Make a payment:";
             } else if (cmd.toLowerCase().contains("exit") || cmd.equalsIgnoreCase("x")) {
                 return "exit";
             } else {
@@ -163,6 +168,55 @@ public class NewBank {
         }
         return "Transfer request has failed. Double check your balance.";
     }
+
+    public String deleteAccount(String userName, String accountName){
+        Account account = dbReadOperations.getAccount(userName, accountName);
+
+        if (account == null) return "Account does not exist. Withdraw request failed.";
+        customers.get(userName).getAccounts().remove(account); // remove account obj if exists
+        int accountId = dbReadOperations.getAccountId(userName, accountName);
+
+        if (dbDeleteOperations.deleteAccount(accountId)){
+            return "Account " + accountName + " successfully deleted.";
+        }
+        return "Account deletion has failed. Try again.";
+    }
+
+    // Payment method where the user (userName1) makes a payment to a different customer by specifying:
+    // - the account they with to make the transaction from (accountName1)
+    // - the username (userName2) of the customer and their account (account2) they with to transfer the money to
+    // - the amount of payment
+    public String pay(String userName1, String accountName1, String userName2, String accountName2, double payment){
+        Account account1 = dbReadOperations.getAccount(userName1, accountName1);
+        Account account2 = dbReadOperations.getAccount(userName2, accountName2);
+        if (account1 == null || account2 == null ) {
+            return "One or both of the entered accounts does not exist. Transfer request failed.";
+        }
+        if (!customers.get(userName1).getAccounts().contains(account1)) { // adding the account before we manipulate balance
+            customers.get(userName1).addAccount(account1);
+        }
+        if (!customers.get(userName2).getAccounts().contains(account2)) {
+            customers.get(userName2).addAccount(account2);
+        }
+        int account1ID = dbReadOperations.getAccountId(userName1, accountName1);
+        int account2ID = dbReadOperations.getAccountId(userName2, accountName2);
+
+        double account1Balance = account1.getBalance(); // accessing the balance from account1
+        double account2Balance = account2.getBalance(); // and account2
+        double newAccount1Balance = account1Balance - payment; // moving amount from account1 to account2
+        double newAccount2Balance = account2Balance + payment;
+
+        // only if balance values in the database are updated, they will be set in the HashMap
+        if (dbUpdateOperations.update(account1ID, newAccount1Balance) && dbUpdateOperations.update(account2ID, newAccount2Balance)){
+            customers.get(userName1).getAccount(accountName1).setBalance(newAccount1Balance);
+            customers.get(userName2).getAccount(accountName2).setBalance(newAccount2Balance);
+            return userName1 + " has paid £" + payment + " from " + accountName1.toUpperCase()
+                    + " to " + userName2 +"'s account " + accountName2.toUpperCase() + ".\n\nYour current account balance:\n"
+                    + accountName1.toUpperCase() + ": £" + newAccount1Balance;
+        }
+        return "Payment request has failed. Double check your balance.";
+    }
+
 
     // takes user's input of account type and starting balance and opens a new account
     // using the database
