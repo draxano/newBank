@@ -173,15 +173,10 @@ public class NewBank {
         Account account = dbReadOperations.getAccount(userName, accountName);
 
         if (account == null) return "Account does not exist. Withdraw request failed.";
-
-        if (!customers.get(userName).getAccounts().contains(account)) {
-            customers.get(userName).addAccount(account);
-        }
-
+        customers.get(userName).getAccounts().remove(account); // remove account obj if exists
         int accountId = dbReadOperations.getAccountId(userName, accountName);
 
         if (dbDeleteOperations.deleteAccount(accountId)){
-            customers.get(userName).getAccounts().remove(account);
             return "Account " + accountName + " successfully deleted.";
         }
         return "Account deletion has failed. Try again.";

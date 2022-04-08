@@ -28,7 +28,7 @@ public class dbDeleteOperations {
         boolean success = false;
         String sqlDelete = "DELETE FROM accounts WHERE id =?";
         try (Connection con = dbConnection.connect(); PreparedStatement ps = con.prepareStatement(sqlDelete)) {
-            ps.setInt(2, accountId);
+            ps.setInt(1, accountId);
             ps.executeUpdate();
             success = true;
 
