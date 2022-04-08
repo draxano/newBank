@@ -16,6 +16,7 @@ public class NewBank {
     private NewBank() {
         customers = dbOperations.loadMap();
     }
+    public boolean userPermission = false;
 
     public static NewBank getBank() {
         return bank;
@@ -56,7 +57,7 @@ public class NewBank {
         String cmd;
 
         if (tokens.length == 0) {
-            return "FAIL";
+            return "Invalid Input.";
         }
 
         cmd = tokens[0];
@@ -92,17 +93,20 @@ public class NewBank {
 
 
     // adds money to an account (if account exists), returns confirmation message.
-    public String depositMoney(String userName, String accountName, double deposit) {
+    public String depositMoney(String userName, String accountName, String deposit) {
         Account account = dbReadOperations.getAccount(userName, accountName); // obtain an account object
         if (account == null) return "Account does not exist. Deposit request failed.";
         if (!customers.get(userName).getAccounts().contains(account)) { // adding the account before we manipulate balance
             customers.get(userName).addAccount(account);
         }
+        // check valid input, parse to double if true
+        Double depositNum = getaDouble(deposit);
+        if (depositNum == null) return "Request denied, Deposit amount not a valid number.";
 
         int accountId = dbReadOperations.getAccountId(userName, accountName);
 
         double currentBalance = account.getBalance(); // use account object to obtain balance
-        double newBalance = currentBalance + deposit; // calculate new balance
+        double newBalance = currentBalance + depositNum; // calculate new balance
         if (dbUpdateOperations.update(accountId, newBalance)) {
             customers.get(userName).getAccount(accountName).setBalance(newBalance); // update customer object in hashMap
             return accountName + " has been credited with " + deposit + "." + " The new balance is " + newBalance;
@@ -111,10 +115,17 @@ public class NewBank {
     }
 
     // withdraws money from account (if enough money present && account exists), returns confirmation message.
-    public String withdrawMoney(String userName, String accountName, double withdraw) {
+    public String withdrawMoney(String userName, String accountName, String withdraw) {
         Account account = dbReadOperations.getAccount(userName, accountName); // obtain account object
-
         if (account == null) return "Account does not exist. Withdraw request failed.";
+        // check valid input, parse to double if true
+        Double withdrawNum = getaDouble(withdraw);
+        if (withdrawNum == null) return "Request denied, Withdraw amount not a valid number.";
+
+        // then check if the user is withdrawing a valid amount
+        if (withdrawNum >= 10_000) return "Withdraw request failed. Withdrawals of above 10k are not allowed";
+        if (withdrawNum >= 1000 && !userPermission) return "Withdrawal request above 1000, would you like to proceed?";
+
         if (!customers.get(userName).getAccounts().contains(account)) { // adding the account before we manipulate balance
             customers.get(userName).addAccount(account);
         }
@@ -122,7 +133,7 @@ public class NewBank {
         int accountId = dbReadOperations.getAccountId(userName, accountName);
 
         double currentBalance = account.getBalance(); // use account object to obtain balance
-        double newBalance = currentBalance - withdraw; // calculate new balance
+        double newBalance = currentBalance - withdrawNum; // calculate new balance
         if (dbUpdateOperations.update(accountId, newBalance)) {
             customers.get(userName).getAccount(accountName).setBalance(newBalance); // update customer object in hashMap
             return userName + " has withdrawn " + withdraw + " from " + accountName + "." + " The new balance is " + newBalance;
@@ -132,7 +143,7 @@ public class NewBank {
 
     // transfers amount of money from account1 to account2 (if enough money present && account exists),
     // returns confirmation message.
-    public String transferMoney(String userName, String firstAccountName, String secondAccountName, double transferAmount){
+    public String transferMoney(String userName, String firstAccountName, String secondAccountName, String transferAmount){
         Account account1 = dbReadOperations.getAccount(userName, firstAccountName);
         Account account2 = dbReadOperations.getAccount(userName, secondAccountName);
         if (account1 == null || account2 == null) {
@@ -147,10 +158,14 @@ public class NewBank {
         int account1ID = dbReadOperations.getAccountId(userName, firstAccountName);
         int account2ID = dbReadOperations.getAccountId(userName, secondAccountName);
 
+        // check valid input, parse to double if true
+        Double transferAmountNum = getaDouble(transferAmount);
+        if (transferAmountNum == null) return "Request denied, Transfer amount is not a valid number.";
+
         double account1Balance = account1.getBalance(); // accessing the balance from account1
         double account2Balance = account2.getBalance(); // and account2
-        double newAccount1Balance = account1Balance - transferAmount; // moving amount from account1 to account2
-        double newAccount2Balance = account2Balance + transferAmount;
+        double newAccount1Balance = account1Balance - transferAmountNum; // moving amount from account1 to account2
+        double newAccount2Balance = account2Balance + transferAmountNum;
 
         // only if balance values in the database are updated, they will be set in the HashMap
         if (dbUpdateOperations.update(account1ID, newAccount1Balance) && dbUpdateOperations.update(account2ID, newAccount2Balance)){
@@ -166,7 +181,7 @@ public class NewBank {
 
     // takes user's input of account type and starting balance and opens a new account
     // using the database
-    public String processAccountRequest(String userName, String accountType, double startingBalance) {
+    public String processAccountRequest(String userName, String accountType, String startingBalance) {
         // check first what accounts already exist if any. make sure users do not add accounts of the same name
         ArrayList<Account> accounts = dbReadOperations.getAccounts(userName);
         if (!accounts.isEmpty()) {
@@ -176,12 +191,35 @@ public class NewBank {
                 }
             }
         }
+        Double startBalanceNum = getaDouble(startingBalance);
+        if (startBalanceNum == null) return "Request denied, Starting balance not a valid number.";
         // if an account was created successfully then add the account to the associated customer object in the hashMap
-        if (dbCreateOperations.addAccount(userName, accountType, startingBalance)) {
-            customers.get(userName).addAccount(new Account(accountType, startingBalance));
+        if (dbCreateOperations.addAccount(userName, accountType, startBalanceNum)) {
+            customers.get(userName).addAccount(new Account(accountType, startBalanceNum));
             return "Account for " + userName + " has been created.";
         } else {
             return "Account request denied.";
         }
+    }
+
+    private Double getaDouble(String parsableString) {
+        double number = 0;
+        if (inputCheckNum(parsableString)) {
+            number = Double.parseDouble(parsableString);
+        } else {
+            return null;
+        }
+        return number;
+    }
+
+    // checks if the given input is parsable
+    private boolean inputCheckNum(String input) {
+        if (input == null) return false;
+        try {
+            double d = Double.parseDouble(input);
+        } catch (NumberFormatException nfe) {
+            return false;
+        }
+        return true;
     }
 }
