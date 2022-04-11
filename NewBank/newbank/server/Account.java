@@ -1,5 +1,8 @@
 package newbank.server;
 
+import java.text.NumberFormat;
+
+import java.util.Locale;
 import java.util.Objects;
 
 public class Account {
@@ -15,7 +18,8 @@ public class Account {
 
     // In order to print out account details
     public String toString() {
-        return (accountName + ": " + openingBalance);
+        NumberFormat gbpFormat = NumberFormat.getCurrencyInstance(Locale.UK);
+        return (accountName + ": " + gbpFormat.format(openingBalance));
     }
 
     // Get the name of the account
