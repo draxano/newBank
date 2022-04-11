@@ -6,8 +6,10 @@ import newbank.database.dbReadOperations;
 import newbank.database.dbUpdateOperations;
 import newbank.database.dbDeleteOperations;
 
+import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class NewBank {
     // all bank instances will have a HashTable containing all customers
@@ -34,6 +36,11 @@ public class NewBank {
             return true;
         }
         return false;
+    }
+
+    public String toFormat(double amount){
+        NumberFormat gbpFormat = NumberFormat.getCurrencyInstance(Locale.UK);
+        return gbpFormat.format(amount);
     }
 
     // gets account from database and adds to customer object inside the hashmap
@@ -79,6 +86,9 @@ public class NewBank {
                 return "Close an Account:";
             } else if (cmd.toLowerCase().contains("pay") || cmd.equalsIgnoreCase("7")) {
                 return "Make a payment:";
+            } else if (cmd.toLowerCase().contains("deleteuserdata") || cmd.equalsIgnoreCase("8")) {
+                return "Delete user data:";
+
             } else if (cmd.toLowerCase().contains("exit") || cmd.equalsIgnoreCase("x")) {
                 return "exit";
             } else {
@@ -110,7 +120,7 @@ public class NewBank {
         double newBalance = currentBalance + deposit; // calculate new balance
         if (dbUpdateOperations.update(accountId, newBalance)) {
             customers.get(userName).getAccount(accountName).setBalance(newBalance); // update customer object in hashMap
-            return accountName + " has been credited with " + deposit + "." + " The new balance is " + newBalance;
+            return accountName + " has been credited with " + toFormat(deposit) + "." + " The new balance is " + toFormat(newBalance);
         }
         return "Deposit request has failed.";
     }
@@ -130,7 +140,7 @@ public class NewBank {
         double newBalance = currentBalance - withdraw; // calculate new balance
         if (dbUpdateOperations.update(accountId, newBalance)) {
             customers.get(userName).getAccount(accountName).setBalance(newBalance); // update customer object in hashMap
-            return userName + " has withdrawn " + withdraw + " from " + accountName + "." + " The new balance is " + newBalance;
+            return userName + " has withdrawn " + toFormat(withdraw) + " from " + accountName + "." + " The new balance is " + toFormat(newBalance);
         }
         return "Withdraw request has failed. Double check your balance.";
     }
@@ -161,10 +171,10 @@ public class NewBank {
         if (dbUpdateOperations.update(account1ID, newAccount1Balance) && dbUpdateOperations.update(account2ID, newAccount2Balance)){
             customers.get(userName).getAccount(firstAccountName).setBalance(newAccount1Balance);
             customers.get(userName).getAccount(secondAccountName).setBalance(newAccount2Balance);
-            return userName + " has transferred £" + transferAmount + " from " + firstAccountName.toUpperCase()
+            return userName + " has transferred " + toFormat(transferAmount) + " from " + firstAccountName.toUpperCase()
                     + " to " + secondAccountName.toUpperCase() + ".\nHere is your current balance:\n"
-                    + firstAccountName.toUpperCase() + ": £" + newAccount1Balance + "\n" + secondAccountName.toUpperCase()
-                    + ": £" + newAccount2Balance;
+                    + firstAccountName.toUpperCase() + ": " + toFormat(newAccount1Balance) + "\n" + secondAccountName.toUpperCase()
+                    + ": " + toFormat(newAccount2Balance);
         }
         return "Transfer request has failed. Double check your balance.";
     }
@@ -180,6 +190,16 @@ public class NewBank {
             return "Account " + accountName + " successfully deleted.";
         }
         return "Account deletion has failed. Try again.";
+    }
+
+    public String deleteUserData(String userName) {
+        customers.remove(userName); // remove customer object
+
+        if (dbDeleteOperations.delete(userName)){
+            return "All data associated with the username " + userName + " have been successfully deleted." +
+                    "\nWe are sorry to see you go.";
+        }
+        return "Deletion request has failed.";
     }
 
     // Payment method where the user (userName1) makes a payment to a different customer by specifying:
@@ -210,9 +230,9 @@ public class NewBank {
         if (dbUpdateOperations.update(account1ID, newAccount1Balance) && dbUpdateOperations.update(account2ID, newAccount2Balance)){
             customers.get(userName1).getAccount(accountName1).setBalance(newAccount1Balance);
             customers.get(userName2).getAccount(accountName2).setBalance(newAccount2Balance);
-            return userName1 + " has paid £" + payment + " from " + accountName1.toUpperCase()
+            return userName1 + " has paid " + toFormat(payment) + " from " + accountName1.toUpperCase()
                     + " to " + userName2 +"'s account " + accountName2.toUpperCase() + ".\n\nYour current account balance:\n"
-                    + accountName1.toUpperCase() + ": £" + newAccount1Balance;
+                    + accountName1.toUpperCase() + ": " + toFormat(newAccount1Balance);
         }
         return "Payment request has failed. Double check your balance.";
     }
@@ -233,7 +253,7 @@ public class NewBank {
         // if an account was created successfully then add the account to the associated customer object in the hashMap
         if (dbCreateOperations.addAccount(userName, accountType, startingBalance)) {
             customers.get(userName).addAccount(new Account(accountType, startingBalance));
-            return "Account for " + userName + " has been created.";
+            return "Account " + accountType.toUpperCase() + " for " + userName + " has been created.";
         } else {
             return "Account request denied.";
         }

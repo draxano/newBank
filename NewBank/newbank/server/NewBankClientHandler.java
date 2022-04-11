@@ -25,7 +25,7 @@ public class NewBankClientHandler extends Thread{
 
 		// keep getting requests from the client and processing them
 		try {
-			out.println("Welcome to the bank. Press 1 to create an account, Press 2 to Login.");
+			out.println("Welcome to New Bank. Press 1 to create an account, Press 2 to Login.");
 			String answer = in.readLine();
 			if (answer.equals("1")) {
 				out.println("Set your username");
@@ -67,7 +67,7 @@ public class NewBankClientHandler extends Thread{
 					if (response.equals("Open a new bank account:")) {
 						out.println("What type of account is it? / Account name");
 						String accountType = in.readLine().toLowerCase();
-						out.println("What would you like your starting balance to be?");
+						out.println("What would you like your starting balance to be? Please enter amount in GBP: ");
 						double startingBalance = Double.parseDouble(in.readLine());
 						String accountResponse = bank.processAccountRequest(userName, accountType, startingBalance);
 						out.println(accountResponse);
@@ -76,7 +76,7 @@ public class NewBankClientHandler extends Thread{
 					if (response.equals("Deposit Money:")) {
 						out.println("Which account would you like to deposit into?");
 						String accountName = in.readLine().toLowerCase();
-						out.println("How much would you like to deposit?");
+						out.println("How much would you like to deposit? Please enter amount in GBP: ");
 						double deposit = Double.parseDouble(in.readLine());
 						String depositResponse = bank.depositMoney(userName, accountName, deposit);
 						out.println(depositResponse);
@@ -85,7 +85,7 @@ public class NewBankClientHandler extends Thread{
 					if (response.equals("Withdraw Money:")) {
 						out.println("Which account would you like to withdraw from?");
 						String accountName = in.readLine().toLowerCase();
-						out.println("How much would you like to withdraw?");
+						out.println("How much would you like to withdraw? Please enter amount in GBP: ");
 						double withdraw = Double.parseDouble(in.readLine());
 						String withdrawResponse = bank.withdrawMoney(userName, accountName, withdraw);
 						out.println(withdrawResponse);
@@ -96,7 +96,7 @@ public class NewBankClientHandler extends Thread{
 						String firstAccountName = in.readLine().toLowerCase();
 						out.println("Which account would you like to transfer money to?");
 						String secondAccountName = in.readLine().toLowerCase();
-						out.println("Please enter the transfer amount: ");
+						out.println("Please enter the transfer amount in GBP: ");
 						double transfer = Double.parseDouble(in.readLine());
 						String transferResponse = bank.transferMoney(userName, firstAccountName, secondAccountName, transfer);
 						out.println(transferResponse);
@@ -112,7 +112,6 @@ public class NewBankClientHandler extends Thread{
 							String deleteAccountResponse = bank.deleteAccount(userName, accountName);
 							out.println(deleteAccountResponse);
 						} else {out.println("Account " + accountName + " not deleted.");}
-
 					}
 
 					if (response.equals("Make a payment:")) {
@@ -120,12 +119,12 @@ public class NewBankClientHandler extends Thread{
 						String userName2 = in.readLine().toLowerCase();
 						out.println("Enter " + userName2 + "'s" + " account name you wish to send the payment to:");
 						String accountName2 = in.readLine().toLowerCase();
-						out.println("Please enter the payment amount: ");
+						out.println("Please enter the payment amount in GBP: ");
 						double pay = Double.parseDouble(in.readLine());
 						out.println("Which account would you like to make the payment from? Enter your account:");
 						String accountName1 = in.readLine().toLowerCase();
 						String confirm = "Are you sure to proceed with the following payment:\n\nPAY "
-								+ userName2 + " £" + pay + " to account " + accountName2.toUpperCase()
+								+ userName2 + " " + bank.toFormat(pay) + " to account " + accountName2.toUpperCase()
 								+ "\n\nEnter 1 to confirm, or any other key to cancel";
 						out.println(confirm);
 						String userResponse = in.readLine().toLowerCase();
@@ -134,7 +133,17 @@ public class NewBankClientHandler extends Thread{
 							out.println(payResponse);
 						} else {out.println("Payment transaction cancelled.");}
 					}
+					if (response.equals("Delete user data:")) {
+						out.println("We are sorry if we have caused you any inconvenience." +
+								"\nAre you sure you want to remove ALL your data from New Bank?" +
+								"\nEnter 1 to proceed, any other key to cancel.");
+						String userResponse = in.readLine().toLowerCase();
+						if (userResponse.equalsIgnoreCase("1")){
+							String deleteUserDataResponse = bank.deleteUserData(userName);
+							out.println(deleteUserDataResponse);
+						} else {out.println("Something went wrong. Please try again.");}
 
+					}
 					if (response.equals("exit")) run();
 				}
 			} else {
@@ -160,13 +169,14 @@ public class NewBankClientHandler extends Thread{
 
 	private void instructions() {
 		out.println("You have the following options:");
-		out.println("Enter SHOWMYACCOUNTS or enter '1' to view your accounts");
-		out.println("Enter NEWACCOUNT or enter '2' to create a new account");
+		out.println("Enter SHOWMYACCOUNTS or enter '1' to view your accounts.");
+		out.println("Enter NEWACCOUNT or enter '2' to create a new account.");
 		out.println("Enter WITHDRAW or enter '3' to withdraw money from an account.");
-		out.println("Enter DEPOSIT or enter '4' to deposit money into an account");
-		out.println("Enter TRANSFER or enter '5' to transfer money between accounts");
-		out.println("Enter CLOSEACCOUNT or enter '6' to close an account");
-		out.println("Enter PAY or enter '7' to pay to someone's account");
+		out.println("Enter DEPOSIT or enter '4' to deposit money into an account.");
+		out.println("Enter TRANSFER or enter '5' to transfer money between accounts.");
+		out.println("Enter CLOSEACCOUNT or enter '6' to close an account.");
+		out.println("Enter PAY or enter '7' to pay to someone's account.");
+		out.println("Enter DELETEUSERDATA or enter '8' if you wish to remove all your data from New Bank.");
 		out.println("Enter HELP or enter 'h' to see options again");
 		out.println("Enter EXIT or 'x' to exit");
 	}
