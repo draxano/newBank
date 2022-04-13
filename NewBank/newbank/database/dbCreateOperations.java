@@ -68,4 +68,45 @@ public class dbCreateOperations {
         }
         return false;
     }
+
+    /*
+    This method takes in the required information to create a microloan
+    @param username, accountName, amount, dueDate
+    @return Success of adding to the database
+     */
+    public static boolean addMicroLoan(String username, String accountName, double loanAmount, String dueDate) {
+        int accountId;
+        int userId = dbReadOperations.getUserId(username);
+        String sqlQuery = "INSERT into loans() VALUES (?,?)";
+
+        try (Connection con = dbConnection.connect(); PreparedStatement ps = con.prepareStatement(sqlQuery, Statement.RETURN_GENERATED_KEYS)) {
+            con.setAutoCommit(false);
+            ps.setString(1, accountName);
+            ps.setDouble(2, loanAmount);
+            ps.executeUpdate();
+            ResultSet rs = ps.getGeneratedKeys();
+            if (rs.next()) {
+                accountId = rs.getInt(1);
+            }
+
+            // if the user and account exist, create loan
+            if (accountId > 0 && userId > 0) {
+                String mappingSql = "INSERT into accountmappings(userid, accountid) VALUES(?,?)";
+                PreparedStatement link = con.prepareStatement(mappingSql);
+                link.setInt(1, userId);
+                link.setInt(2, accountId);
+                link.executeUpdate();
+                con.commit(); // save changes made to db
+                System.out.println("For: " + username + ", a new " + accountName + " account has been opened with starting balance of " + startingBalance);
+                return true;
+
+            } else {
+                con.rollback(); // reverse changes made to the db
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 }
